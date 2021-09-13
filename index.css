@@ -1,0 +1,33 @@
+h1 {
+    margin:auto;
+    text-align: center;
+}
+
+#leftFighter, #rightFighter {
+    width: 25%;
+    background-color: chartreuse;
+    padding:5%
+}
+
+.cen {
+    display:flex;
+    justify-content: center;
+    padding:5px;
+}
+
+
+#leftFighter {
+    margin-left: 10%;
+    float: left
+    
+}
+
+#rightFighter {
+    margin-right: 10%;
+    float: right
+}
+
+
+.flex { 
+    display:flex;
+    justify-content: space-evenly; }
