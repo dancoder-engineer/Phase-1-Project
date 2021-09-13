@@ -1,12 +1,25 @@
-h1 {
+h1, h2 {
     margin:auto;
     text-align: center;
 }
 
-#leftFighter, #rightFighter {
-    width: 25%;
+.centered {
+    display:block;
+    margin:auto;
+}
+
+#middle {
+    display:block;
+    margin:auto;
+    width: 5%;
     background-color: chartreuse;
-    padding:5%
+    padding:1%
+}
+
+#leftFighter, #rightFighter {
+    width: 20%;
+    background-color: chartreuse;
+    padding:1%
 }
 
 .cen {
