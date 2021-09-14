@@ -96,7 +96,7 @@ function fight() {
     if (left > right) {winner = getNames()[0] }
     else {winner = getNames()[1] }
 
-    res.innerHTML += `<p>Round ${round}: ${getNames()[0]} vs. ${getNames()[1]}<br>                 Winner: ${winner}!`
+    res.innerHTML += `<p>Round ${round}: ${getNames()[0]} vs. ${getNames()[1]}<br> Winner: ${winner}!`
 }
 
 
@@ -115,4 +115,29 @@ document.querySelector("#rightSelect").addEventListener("click", function() { ch
 document.querySelector("#fight").addEventListener("click", fight)
 
 
+
+document.querySelector("#leftBack").addEventListener("click", function() {  
+    leftPage -= 1
+    if (leftPage === 0) { leftPage = 1 }
+    getData(leftPage, populateLeft)
+ })
+
+document.querySelector("#leftForward").addEventListener("click", function() { 
+    leftPage += 1
+    if (leftPage === 35) { leftPage = 34 }
+    getData(leftPage, populateLeft)
+ })
+
+
+document.querySelector("#rightBack").addEventListener("click", function() {     
+    rightPage -= 1
+    if (rightPage === 0) { rightPage = 1 }
+    getData(rightPage, populateRight)
+ })
+
+document.querySelector("#rightForward").addEventListener("click", function() {     
+    rightPage += 1
+    if (rightPage === 35) { rightPage = 34 }
+    getData(rightPage, populateRight)
+ })
 
