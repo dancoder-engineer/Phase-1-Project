@@ -60,3 +60,7 @@ h1, h2 {
     grid-column-start: 3;
     grid-column-end: span 3;
 }
+
+#leftImg, #rightImg {
+    position: relative
+}

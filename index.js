@@ -81,12 +81,42 @@ function changeFighter(dir) {
 
 }
 
+
+
 function fight() {
+    let lPic = document.querySelector("#leftImg")
+    let rPic = document.querySelector("#rightImg")
+    let lPos = 0
+    let rPos = 0
+    let lSrc = lPic.src
+    let rSrc = rPic.src
+    let moved = 0
+
+    
+    let inter = setInterval(() => move(), 75);
+  
+
+    function move() {
+        lPos += 10
+        rPos -= 10
+        lPic.style.left=`${lPos}px`
+        rPic.style.left=`${rPos}px`
+        moved ++
+        if (moved === 25) { 
+            lPic.style.left=`0px`
+            rPic.style.left=`0px`
+            clearTimeout(inter) 
+            finishFight()
+        }
+
+    }
+}
+
+function finishFight() {
     let left = 0
     let right = 0
     let winner
-    
-    res = document.querySelector("#results")
+    let res = document.querySelector("#results") 
 
     while (left === right) {
         left = Math.floor(Math.random() * 10 )
@@ -98,6 +128,7 @@ function fight() {
     else {winner = getNames()[1] }
 
     res.innerHTML += `<p>Round ${round}: ${getNames()[0]} vs. ${getNames()[1]}<br> Winner: ${winner}!`
+
 }
 
 
@@ -118,6 +149,8 @@ function placeFightButton() {
 
 
 }
+
+
 
 
 document.addEventListener("DOMContentLoaded", init)
@@ -154,3 +187,8 @@ document.querySelector("#rightForward").addEventListener("click", function() {
     getData(rightPage, populateRight)
  })
 
+
+
+
+
+ document.querySelector("#leftImg").addEventListener("click", fight)
