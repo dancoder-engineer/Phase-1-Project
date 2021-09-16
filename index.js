@@ -3,6 +3,9 @@ let rightPage = 1
 let round = 0
 let leftChar
 let rightChar
+let lChrNo 
+let rChrNo 
+let howChosen = [0,0,"", ""]
 
 function init() {
     placeFightButton()
@@ -47,9 +50,8 @@ function populateRight(data) {
      changeFighter(1)
 }
 
-function changeFighter(dir) {
+function changeFighter(dir, url="no") {
     let elem
-    let url
     let dropDown
     let chrNo
 
@@ -59,21 +61,27 @@ function changeFighter(dir) {
     document.getElementById("leftP").innerText = `Pg. ${leftPage}`
     document.getElementById("rightP").innerText = `Pg. ${rightPage}`
 
+    
+    
     if (dir === 0) { 
         dropDown =  document.getElementById("leftSelect")
         elem = document.querySelector("#leftImg")
-        chrNo = (leftPage - 1) * 20 + parseInt(dropDown.value) }
+        chrNo = (leftPage - 1) * 20 + parseInt(dropDown.value)
+        lChrNo = chrNo 
+    }
 
     if (dir === 1) { 
         dropDown =  document.getElementById("rightSelect")
         elem = document.querySelector("#rightImg")
-        chrNo = (rightPage - 1) * 20 + parseInt(dropDown.value) }
+        chrNo = (rightPage - 1) * 20 + parseInt(dropDown.value)
+        rChrNo = chrNo}
 
-    
-    url =  `https://rickandmortyapi.com/api/character/${chrNo}`
+   if (url === "no") { url =  `https://rickandmortyapi.com/api/character/${chrNo}` }
     fetch(url)
     .then ( res => res.json() )
     .then ( data => elem.src = data.image ) //data => console.log(data)
+
+    
 
 
 
@@ -150,7 +158,11 @@ function finishFight() {
     if (left > right) {winner = getNames()[0] }
     else {winner = getNames()[1] }
 
-    res.innerHTML += `<p>Round ${round}: ${getNames()[0]} vs. ${getNames()[1]}<br> Winner: ${winner}!`
+    
+    res.innerHTML += `<p>Round ${round}: <span class="lSpan" id="l${lChrNo}">${getNames()[0]}</span> vs. <span class="rSpan" id="r${rChrNo}">${getNames()[1]}</span><br> Winner: ${winner}!`
+
+ 
+
     document.querySelector("#leftSelect").disabled = false
     document.querySelector("#rightSelect").disabled = false
     document.querySelector("#leftBack").disabled = false
@@ -158,12 +170,42 @@ function finishFight() {
     document.querySelector("#rightBack").disabled = false
     document.querySelector("#rightForward").disabled = false
 
+    let span1 = document.querySelectorAll(`.lSpan`)
+    let span2 = document.querySelectorAll(`.rSpan`)
+    //console.log(span1)
+    for (i of span1) {
+
+    i.addEventListener("click", function(e) {
+       howChosen[0] = 1
+       let url = `https://rickandmortyapi.com/api/character/${e.target.id.slice(1,)}`
+        howChosen[2] = e.target.innerText
+         changeFighter(0, url)
+    }) }
+
+    for (i of span2) {
+        i.addEventListener("click", function(e) {
+            howChosen[1] = 1
+            let url = `https://rickandmortyapi.com/api/character/${e.target.id.slice(1,)}`
+            howChosen[3] = e.target.innerText
+          changeFighter(1,url)
+        }) }
+
+
+
+
 }
 
 
 function getNames() {
+    let left
+    let right
 
-    return [document.getElementById("leftSelect").children[leftChar-1].innerText, document.getElementById("rightSelect").children[rightChar-1].innerText]
+    if(howChosen[0] === 0) { left = document.getElementById("leftSelect").children[leftChar-1].innerText }
+    if(howChosen[0] === 1) { left = howChosen[2] }
+    if(howChosen[1] === 0) { right = document.getElementById("rightSelect").children[rightChar-1].innerText }
+    if(howChosen[1] === 1) { right = howChosen[3] }
+    
+    return [left, right]
 
 }
 
@@ -183,10 +225,12 @@ function placeFightButton() {
 
 
 document.addEventListener("DOMContentLoaded", init)
-document.querySelector("#leftSelect").addEventListener("change", function() {
+document.querySelector("#leftSelect").addEventListener("change", function() { 
+    howChosen[0] = 0
     changeFighter(0) })
 
 document.querySelector("#rightSelect").addEventListener("change", function() { 
+    howChosen[1] = 0
     changeFighter(1) })
 
 

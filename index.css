@@ -19,13 +19,7 @@ h1, h2 {
     margin:auto;
 }
 
-#middle {
-    display:block;
-    margin:auto;
-    grid-column-start: 4;
-    grid-row-start: 3;
-    background-color: chartreuse;
-}
+
 
 
 
@@ -40,14 +34,19 @@ h1, h2 {
 #leftFighter {
     grid-column-start: 2;
     grid-row-start: 3;
-    background-color: chartreuse;
     
+}
+
+#middle {
+    display:block;
+    margin:auto;
+    grid-column-start: 4;
+    grid-row-start: 3;
 }
 
 #rightFighter {
     grid-column-start: 6;
     grid-row-start: 3;
-    background-color: chartreuse;
 }
 
 
@@ -67,4 +66,8 @@ h1, h2 {
 
 #leftImg{
     float:right
+}
+
+body {
+    background-color:#90f3a4;
 }
