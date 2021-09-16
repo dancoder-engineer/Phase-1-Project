@@ -1,6 +1,5 @@
 let leftPage = 1
 let rightPage = 1
-let fighting = false
 let round = 0
 let leftChar
 let rightChar
@@ -88,10 +87,19 @@ function fight() {
     let rPic = document.querySelector("#rightImg")
     let lPos = 0
     let rPos = 0
+    let cloudSize = 82
+    let cloud = document.querySelector("#cloud")
     let lSrc = lPic.src
     let rSrc = rPic.src
     let moved = 0
+    
+    document.querySelector("#leftSelect").disabled = true
+    document.querySelector("#rightSelect").disabled = true
 
+    document.querySelector("#leftBack").disabled = true
+    document.querySelector("#leftForward").disabled = true
+    document.querySelector("#rightBack").disabled = true
+    document.querySelector("#rightForward").disabled = true
     
     let inter = setInterval(() => move(), 75);
   
@@ -101,10 +109,25 @@ function fight() {
         rPos -= 10
         lPic.style.left=`${lPos}px`
         rPic.style.left=`${rPos}px`
-        moved ++
-        if (moved === 25) { 
+        moved++
+
+        if (moved === 20) {
+            cloud.width = `${cloudSize}`
+            cloud.height = `${cloudSize}`
+            cloud.src="cloud.jpg"
+        }
+
+        if (moved > 20) {
+            cloudSize += 41
+            cloud.width = `${cloudSize}`
+            cloud.height = `${cloudSize}`
+        }
+
+        if (moved === 35) { 
             lPic.style.left=`0px`
             rPic.style.left=`0px`
+            cloud.width = `0`
+            cloud.height = `0`
             clearTimeout(inter) 
             finishFight()
         }
@@ -128,6 +151,12 @@ function finishFight() {
     else {winner = getNames()[1] }
 
     res.innerHTML += `<p>Round ${round}: ${getNames()[0]} vs. ${getNames()[1]}<br> Winner: ${winner}!`
+    document.querySelector("#leftSelect").disabled = false
+    document.querySelector("#rightSelect").disabled = false
+    document.querySelector("#leftBack").disabled = false
+    document.querySelector("#leftForward").disabled = false
+    document.querySelector("#rightBack").disabled = false
+    document.querySelector("#rightForward").disabled = false
 
 }
 
@@ -154,8 +183,11 @@ function placeFightButton() {
 
 
 document.addEventListener("DOMContentLoaded", init)
-document.querySelector("#leftSelect").addEventListener("click", function() { changeFighter(0) })
-document.querySelector("#rightSelect").addEventListener("click", function() { changeFighter(1) })
+document.querySelector("#leftSelect").addEventListener("change", function() {
+    changeFighter(0) })
+
+document.querySelector("#rightSelect").addEventListener("change", function() { 
+    changeFighter(1) })
 
 
 
@@ -175,13 +207,13 @@ document.querySelector("#leftForward").addEventListener("click", function() {
  })
 
 
-document.querySelector("#rightBack").addEventListener("click", function() {     
+document.querySelector("#rightBack").addEventListener("click", function() {    
     rightPage -= 1
     if (rightPage === 0) { rightPage = 1 }
     getData(rightPage, populateRight)
  })
 
-document.querySelector("#rightForward").addEventListener("click", function() {     
+document.querySelector("#rightForward").addEventListener("click", function() {   
     rightPage += 1
     if (rightPage === 35) { rightPage = 34 }
     getData(rightPage, populateRight)
