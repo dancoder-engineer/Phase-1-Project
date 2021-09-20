@@ -97,8 +97,6 @@ function fight() {
     let rPos = 0
     let cloudSize = 82
     let cloud = document.querySelector("#cloud")
-    let lSrc = lPic.src
-    let rSrc = rPic.src
     let moved = 0
     
     document.querySelector("#leftSelect").disabled = true
