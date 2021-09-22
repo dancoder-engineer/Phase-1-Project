@@ -1,85 +1,69 @@
-let leftPage = 1
-let rightPage = 1
+let pages = {left: 1, right: 1}
 let round = 0
-let leftChar
-let rightChar
-let lChrNo 
-let rChrNo 
-let howChosen = [0,0,"", ""]
+let fighterID = {left: 1, right: 1}
+let howFighterWasChosen = {leftMethod: 'optionBox', rightMethod: 'optionBox', leftFighterName: "", rightFightername: ""}
+let firstPage = 1
+let lastPage = 0 //It's actually 34, this will be added from the API itself in init()
 
 function init() {
-    placeFightButton()
-    getData(leftPage, populateLeft)
-    getData(rightPage, populateRight)
+
+    fetch('https://rickandmortyapi.com/api/character/')
+    .then ( res => res.json() )
+    .then ( data => lastPage = data.info.pages )
+
+    showFightButton(true)
+    getData('left')
+    getData('right')
     
 }
 
 
-function getData(page, func) {
-    let url = `https://rickandmortyapi.com/api/character/?page=${page}`
+function getData(side) {
+    let url = `https://rickandmortyapi.com/api/character/?page=${pages[side]}`
     fetch(url)
     .then ( res => res.json() )
-    .then ( data => func(data) )
+    .then ( data => populateFighter(side, data) )
 }
 
-function populateLeft(data) {
-    let left = document.getElementById("leftSelect")
-    left.innerHTML = ""
-    let num = 0
-    for (i of data.results) { 
-        num++
-        //console.log(i.name)
-        let choice = `<option value=${num}>${i.name}</option>`
-        left.innerHTML += choice
-       
-     }
-     changeFighter(0)
-    //left.innerHTML = ""
-}
 
-function populateRight(data) {
-    let right = document.getElementById("rightSelect")
-    right.innerHTML = ""
+
+
+function populateFighter(side, data) {
+     elem = document.getElementById(`${side}Select`)
+     elem.innerHTML = ""
     let num = 0
     for (i of data.results) { 
         num++
         let choice = `<option value=${num}>${i.name}</option>`
-        right.innerHTML += choice
+        elem.innerHTML += choice
      }
 
-     changeFighter(1)
+     changeFighter(side)
 }
 
-function changeFighter(dir, url="no") {
+
+
+
+
+function changeFighter(side, url="no") {
     let elem
     let dropDown
-    let chrNo
 
-    leftChar = document.querySelector("#leftSelect").value
-    rightChar = document.querySelector("#rightSelect").value
 
-    document.getElementById("leftP").innerText = `Pg. ${leftPage}`
-    document.getElementById("rightP").innerText = `Pg. ${rightPage}`
+    sideChar = document.querySelector(`#${side}Select`).value
 
+    document.getElementById(`${side}P`).innerText = `Pg. ${pages[side]}`
+
+    dropDown =  document.getElementById(`${side}Select`)
+    elem = document.querySelector(`#${side}Img`)
+    fighterID[side] = (pages[side] - 1) * 20 + parseInt(dropDown.value)
     
     
-    if (dir === 0) { 
-        dropDown =  document.getElementById("leftSelect")
-        elem = document.querySelector("#leftImg")
-        chrNo = (leftPage - 1) * 20 + parseInt(dropDown.value)
-        lChrNo = chrNo 
-    }
 
-    if (dir === 1) { 
-        dropDown =  document.getElementById("rightSelect")
-        elem = document.querySelector("#rightImg")
-        chrNo = (rightPage - 1) * 20 + parseInt(dropDown.value)
-        rChrNo = chrNo}
-
-   if (url === "no") { url =  `https://rickandmortyapi.com/api/character/${chrNo}` }
+   if (url === "no") { url =  `https://rickandmortyapi.com/api/character/${fighterID[side]}` }
     fetch(url)
     .then ( res => res.json() )
-    .then ( data => elem.src = data.image ) //data => console.log(data)
+    .then ( data => elem.src = data.image )
 
     
 
@@ -99,13 +83,8 @@ function fight() {
     let cloud = document.querySelector("#cloud")
     let moved = 0
     
-    document.querySelector("#leftSelect").disabled = true
-    document.querySelector("#rightSelect").disabled = true
-
-    document.querySelector("#leftBack").disabled = true
-    document.querySelector("#leftForward").disabled = true
-    document.querySelector("#rightBack").disabled = true
-    document.querySelector("#rightForward").disabled = true
+    
+    toggleButtons()
     
     let inter = setInterval(() => move(), 75);
   
@@ -153,20 +132,15 @@ function finishFight() {
     }
     round++
 
-    if (left > right) {winner = getNames()[0] }
-    else {winner = getNames()[1] }
+    if (left > right) {winner = getNames()['left'] }
+    else {winner = getNames()['right'] }
 
     
-    res.innerHTML += `<p>Round ${round}: <span class="lSpan" id="l${lChrNo}">${getNames()[0]}</span> vs. <span class="rSpan" id="r${rChrNo}">${getNames()[1]}</span><br> Winner: ${winner}!`
+    res.innerHTML += `<p>Round ${round}: <span class="lSpan" id="l${fighterID['left']}">${getNames()['left']}</span> vs. <span class="rSpan" id="r${fighterID['right']}">${getNames()['right']}</span><br> Winner: ${winner}!`
 
  
 
-    document.querySelector("#leftSelect").disabled = false
-    document.querySelector("#rightSelect").disabled = false
-    document.querySelector("#leftBack").disabled = false
-    document.querySelector("#leftForward").disabled = false
-    document.querySelector("#rightBack").disabled = false
-    document.querySelector("#rightForward").disabled = false
+    toggleButtons()
 
     let span1 = document.querySelectorAll(`.lSpan`)
     let span2 = document.querySelectorAll(`.rSpan`)
@@ -174,18 +148,20 @@ function finishFight() {
     for (i of span1) {
 
     i.addEventListener("click", function(e) {
-       howChosen[0] = 1
+       if (document.querySelector("#leftSelect").disabled === true) { return 1 }
+       howFighterWasChosen['leftMethod'] = 'listenerAtBottom'
        let url = `https://rickandmortyapi.com/api/character/${e.target.id.slice(1,)}`
-        howChosen[2] = e.target.innerText
-         changeFighter(0, url)
+        howFighterWasChosen['leftFighterName'] = e.target.innerText
+         changeFighter('left', url)
     }) }
 
     for (i of span2) {
         i.addEventListener("click", function(e) {
-            howChosen[1] = 1
+            if (document.querySelector("#leftSelect").disabled === true) { return 1 }
+            howFighterWasChosen['rightMethod'] = 'listenerAtBottom'
             let url = `https://rickandmortyapi.com/api/character/${e.target.id.slice(1,)}`
-            howChosen[3] = e.target.innerText
-          changeFighter(1,url)
+            howFighterWasChosen['rightFightername'] = e.target.innerText
+          changeFighter('right',url)
         }) }
 
 
@@ -194,27 +170,42 @@ function finishFight() {
 }
 
 
-function getNames() {
-    let left
-    let right
+function toggleButtons() {
+    let truth = document.querySelector("#leftSelect").disabled
+    truth = !truth
+    document.querySelector("#leftSelect").disabled = truth
+    document.querySelector("#rightSelect").disabled = truth
+    document.querySelector("#leftBack").disabled = truth
+    document.querySelector("#leftForward").disabled = truth
+    document.querySelector("#rightBack").disabled = truth
+    document.querySelector("#rightForward").disabled = truth
 
-    if(howChosen[0] === 0) { left = document.getElementById("leftSelect").children[leftChar-1].innerText }
-    if(howChosen[0] === 1) { left = howChosen[2] }
-    if(howChosen[1] === 0) { right = document.getElementById("rightSelect").children[rightChar-1].innerText }
-    if(howChosen[1] === 1) { right = howChosen[3] }
-    
-    return [left, right]
-
+    showFightButton(!truth)
 }
 
 
-function placeFightButton() {
+function getNames() {
+    let ob = {left: "", right: ""}
+    if(howFighterWasChosen['leftMethod'] === 'optionBox') { ob['left'] = document.getElementById("leftSelect").children[(fighterID['left']-1)%20].innerText }
+    if(howFighterWasChosen['leftMethod'] === 'listenerAtBottom') { ob['left'] = howFighterWasChosen['leftFighterName'] }
+    if(howFighterWasChosen['rightMethod'] === 'optionBox') { ob['right'] = document.getElementById("rightSelect").children[(fighterID['right']-1)%20].innerText }
+    if(howFighterWasChosen['rightMethod'] === 'listenerAtBottom') { ob['right'] = howFighterWasChosen['rightFightername'] }
+    return ob
+}
+
+
+function showFightButton(truth) {
+
+    if (truth === true) {
     let butn = document.createElement("button")
     butn.id="fight"
     butn.className="centered"
     butn.innerText="Fight!"
     butn.addEventListener("click", fight)
     document.querySelector("#fightButton").appendChild(butn)
+    }
+
+    if (truth === false) { document.querySelector('#fight').remove() }
 
 
 }
@@ -224,12 +215,12 @@ function placeFightButton() {
 
 document.addEventListener("DOMContentLoaded", init)
 document.querySelector("#leftSelect").addEventListener("change", function() { 
-    howChosen[0] = 0
-    changeFighter(0) })
+    howFighterWasChosen['leftMethod'] = 'optionBox'
+    changeFighter('left') })
 
 document.querySelector("#rightSelect").addEventListener("change", function() { 
-    howChosen[1] = 0
-    changeFighter(1) })
+    howFighterWasChosen['rightMethod'] = 'optionBox'
+    changeFighter('right') })
 
 
 
@@ -237,28 +228,28 @@ document.querySelector("#rightSelect").addEventListener("change", function() {
 
 
 document.querySelector("#leftBack").addEventListener("click", function() {  
-    leftPage -= 1
-    if (leftPage === 0) { leftPage = 1 }
-    getData(leftPage, populateLeft)
+    pages['left'] -= 1
+    if (pages['left'] < firstPage) { pages['left'] = firstPage }
+    getData('left')
  })
 
 document.querySelector("#leftForward").addEventListener("click", function() { 
-    leftPage += 1
-    if (leftPage === 35) { leftPage = 34 }
-    getData(leftPage, populateLeft)
+    pages['left'] += 1
+    if (pages['left'] > lastPage) { pages['left'] = lastPage }
+    getData('left')
  })
 
 
 document.querySelector("#rightBack").addEventListener("click", function() {    
-    rightPage -= 1
-    if (rightPage === 0) { rightPage = 1 }
-    getData(rightPage, populateRight)
+    pages['right'] -= 1
+    if (pages['right'] < firstPage) { pages['right']  = firstPage}
+    getData('right')
  })
 
 document.querySelector("#rightForward").addEventListener("click", function() {   
-    rightPage += 1
-    if (rightPage === 35) { rightPage = 34 }
-    getData(rightPage, populateRight)
+    pages['right']  += 1
+    if (pages['right'] > lastPage) { pages['right']  = lastPage }
+    getData('right')
  })
 
 
